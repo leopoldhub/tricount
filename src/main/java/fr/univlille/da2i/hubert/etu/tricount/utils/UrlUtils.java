@@ -6,8 +6,10 @@ public class UrlUtils {
         return String.format("redirect:%s", redirect);
     }
 
-    public static String buildRedirectUrl(final String redirect, final String error) {
-        return UrlUtils.buildRedirectUrl(redirect) + String.format("?error=%s", error);
+    public static String buildRedirectUrlWithError(final String redirect, final String error) {
+        String redirectUrl = UrlUtils.buildRedirectUrl(redirect).replaceAll("((&)?error=([^&]*))", "");
+        String separator = redirectUrl.contains("?")?!redirectUrl.endsWith("?")?"&":"":"?";
+        return redirectUrl + separator + "error=" + error;
     }
 
 }
