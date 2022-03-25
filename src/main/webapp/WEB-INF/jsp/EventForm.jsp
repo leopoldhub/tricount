@@ -24,12 +24,16 @@
         <div class="alert alert-primary" role="alert">${param.info}</div>
       </c:if>
       <div class="form-floating">
-        <input type="text" class="form-control" id="title" name="title" placeholder="Title" minlength="5" maxlength="64">
+        <input type="text" class="form-control" id="title" name="title1" placeholder="Title" minlength="5" maxlength="64">
         <label for="title">Title</label>
       </div>
       <div class="form-floating">
         <input type="text" class="form-control" id="description" name="description" placeholder="Description" minlength="6" maxlength="64">
         <label for="description">Description</label>
+      </div>
+      <div class="form-floating">
+        <input type="text" class="form-control" id="username" name="username" placeholder="Username" minlength="6" maxlength="16">
+        <label for="username">Username</label>
       </div>
       <button class="w-100 btn btn-lg btn-primary" type="submit">Create event</button>
     </form>

@@ -28,7 +28,7 @@ public class UserEntity extends AnonymousUserEntity {
     @Override
     public String toString() {
         return "UserEntity{" +
-                "email='" + email + '\'' +
+                "email='" + this.email + '\'' +
                 '}';
     }
 

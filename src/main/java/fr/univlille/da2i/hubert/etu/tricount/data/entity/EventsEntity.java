@@ -27,7 +27,7 @@ public class EventsEntity {
 
     @Column(name = "public", nullable = false)
     @ColumnDefault("'false'")
-    private boolean publicEntries = false;
+    private boolean publicEntries;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
     @JsonIgnore
@@ -36,10 +36,10 @@ public class EventsEntity {
     @Override
     public String toString() {
         return "EventsEntity{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", publicEntries=" + publicEntries +
+                "id='" + this.id + '\'' +
+                ", title='" + this.title + '\'' +
+                ", description='" + this.description + '\'' +
+                ", publicEntries=" + this.publicEntries +
                 '}';
     }
 

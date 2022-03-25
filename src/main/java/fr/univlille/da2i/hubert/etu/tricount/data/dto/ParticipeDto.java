@@ -27,6 +27,6 @@ public class ParticipeDto {
 
     @NotNull
     @NotBlank
-    private boolean owner = false;
+    private boolean owner;
 
 }

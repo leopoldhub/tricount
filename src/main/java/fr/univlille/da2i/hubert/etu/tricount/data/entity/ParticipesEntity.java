@@ -44,9 +44,9 @@ public class ParticipesEntity {
     @Override
     public String toString() {
         return "ParticipesEntity{" +
-                "id=" + id +
-                ", owner=" + owner +
-                ", username='" + username + '\'' +
+                "id=" + this.id +
+                ", owner=" + this.owner +
+                ", username='" + this.username + '\'' +
                 '}';
     }
 

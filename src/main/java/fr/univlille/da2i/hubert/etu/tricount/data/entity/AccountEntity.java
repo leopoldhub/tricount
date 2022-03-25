@@ -29,8 +29,8 @@ public class AccountEntity extends UserEntity {
     @Override
     public String toString() {
         return "AccountEntity{" +
-                ", role='" + role + '\'' +
-                ", enabled=" + enabled +
+                ", role='" + this.role + '\'' +
+                ", enabled=" + this.enabled +
                 '}';
     }
 

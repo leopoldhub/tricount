@@ -35,7 +35,7 @@ public class AnonymousUserEntity {
     @Override
     public String toString() {
         return "AnonymousUserEntity{" +
-                "id='" + id + '\'' +
+                "id='" + this.id + '\'' +
                 '}';
     }
 

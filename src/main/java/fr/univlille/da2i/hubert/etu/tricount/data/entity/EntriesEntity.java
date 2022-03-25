@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "entries")
 @Data
 public class EntriesEntity {
-
+    //TODO: add title?
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -25,7 +25,7 @@ public class EntriesEntity {
     private String eventId;
 
     @Column(name = "amount", nullable = false)
-    private Integer amount;
+    private Double amount;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
@@ -48,8 +48,8 @@ public class EntriesEntity {
     @Override
     public String toString() {
         return "EntriesEntity{" +
-                "id=" + id +
-                ", amount=" + amount +
+                "id=" + this.id +
+                ", amount=" + this.amount +
                 '}';
     }
 

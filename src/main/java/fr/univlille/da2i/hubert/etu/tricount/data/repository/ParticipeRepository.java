@@ -14,4 +14,6 @@ public interface ParticipeRepository extends CrudRepository<ParticipesEntity, Pa
 
     List<ParticipesEntity> findByIdEventId(String eventId);
 
+    Optional<ParticipesEntity> findByIdEventIdAndIdUserIdAndOwnerTrue(String eventId, String userId);
+
 }
