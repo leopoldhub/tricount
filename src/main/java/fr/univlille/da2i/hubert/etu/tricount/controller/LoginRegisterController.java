@@ -1,11 +1,13 @@
 package fr.univlille.da2i.hubert.etu.tricount.controller;
 
 import fr.univlille.da2i.hubert.etu.tricount.data.entity.AccountEntity;
-import fr.univlille.da2i.hubert.etu.tricount.data.dto.AccountDto;
-import fr.univlille.da2i.hubert.etu.tricount.data.dto.UserDto;
+import fr.univlille.da2i.hubert.etu.tricount.data.dto.RegisterAccountDto;
 import fr.univlille.da2i.hubert.etu.tricount.data.repository.AccountRepository;
 import fr.univlille.da2i.hubert.etu.tricount.data.repository.UserRepository;
+import fr.univlille.da2i.hubert.etu.tricount.utils.MailUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Controller
 public class LoginRegisterController {
@@ -26,14 +30,18 @@ public class LoginRegisterController {
 
     private final AccountRepository accountRepository;
 
+    private JavaMailSender javaMailSender;
+
     public LoginRegisterController(@Value("${appName}") final String appName,
                                    final BCryptPasswordEncoder passwordEncoder,
                                    final UserRepository userRepository,
-                                   final AccountRepository accountRepository) {
+                                   final AccountRepository accountRepository,
+                                   JavaMailSender javaMailSender) {
         this.appName = appName;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
+        this.javaMailSender = javaMailSender;
     }
 
     @GetMapping("/login")
@@ -53,19 +61,22 @@ public class LoginRegisterController {
     }
 
     @PostMapping("/register")
-    public String registerPost(@Valid final UserDto userdto, @Valid final AccountDto accountDto, @RequestParam("re_password") final String rePassword) {
-        if (!accountDto.getPassword().equals(rePassword))
+    public String registerPost(@Valid final RegisterAccountDto accountDto, ModelMapper modelMapper) throws MessagingException {
+        if (!accountDto.getPassword().equals(accountDto.getConfirmpassword()))
             return "redirect:/register?error=Passwords does not match.";
-        if (this.accountRepository.findByUserEmail(userdto.getEmail()) != null)
+        if (!this.accountRepository.findByUserEmail(accountDto.getEmail()).isEmpty())
             return "redirect:/register?error=Email already taken.";
 
-        final AccountEntity account = new AccountEntity();
-        account.setEmail(userdto.getEmail());
-        account.setPassword(this.passwordEncoder.encode(accountDto.getPassword()));
+        accountDto.setPassword(this.passwordEncoder.encode(accountDto.getPassword()));
 
-        this.accountRepository.save(account);
+        AccountEntity account = modelMapper.map(accountDto, AccountEntity.class);
+        account.setConfirmationCode(UUID.randomUUID().toString());
 
-        return "redirect:/login?info=Registered with success!";
+        account = this.accountRepository.save(account);
+
+        MailUtils.sendMail(this.javaMailSender, "leopold.hubert.etu@univ-lille.fr", account.getEmail(), "Please confirm your account creation", "confirm your account by clicking here: http://localhost:8080/confirmation/" + account.getEmail() + "/" + account.getConfirmationCode());
+
+        return "redirect:/login?info=Please validate your email to end the registration!";
     }
 
 }

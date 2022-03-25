@@ -33,9 +33,9 @@ public class AccountController {
 
     @RequestMapping("/account")
     public String account(final Model model, final Principal principal) {
-        AccountEntity accountEntity = this.userRetriever.getLoggedUserAccount(principal);
+        final AccountEntity accountEntity = this.userRetriever.getLoggedUserAccountOrThrow(principal);
 
-        List<EventsEntity> events = this.participeRepository.findByIdUserId(accountEntity.getId()).stream()
+        final List<EventsEntity> events = this.participeRepository.findByIdUserId(accountEntity.getId()).stream()
                 .map(ParticipesEntity::getEvent)
                 .collect(Collectors.toList());
 

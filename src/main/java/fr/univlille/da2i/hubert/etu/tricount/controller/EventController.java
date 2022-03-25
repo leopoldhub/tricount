@@ -64,7 +64,7 @@ public class EventController {
 
     @PostMapping("config")
     public String getEvent(@PathVariable("id") final String id, @RequestParam final boolean publicEntries, final Principal principal) {
-        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccount(principal);
+        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
         this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
                 .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
 
@@ -79,7 +79,7 @@ public class EventController {
 
     @DeleteMapping("")
     public String deleteEvent(@PathVariable("id") final String id, final Principal principal) {
-        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccount(principal);
+        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
         this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
                 .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
 
@@ -92,7 +92,7 @@ public class EventController {
     @PostMapping("addUser")
     public String getEvent(@PathVariable("id") final String id, @Valid final ParticipantDto participantDto, final ModelMapper modelMapper, final Principal principal) {
         //TODO: send mail...
-        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccount(principal);
+        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
         this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
                 .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
 
@@ -118,9 +118,9 @@ public class EventController {
 
     @PostMapping("addEntry")
     public String getEvent(@PathVariable("id") final String id, @Valid final EntryDto entryDto, final ModelMapper modelMapper, final Principal principal) {
-        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccount(principal);
+        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
 
-        EventsEntity event = this.eventRepository.findById(id).orElseThrow();
+        final EventsEntity event = this.eventRepository.findById(id).orElseThrow();
 
         if(!event.isPublicEntries())
             this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
@@ -129,7 +129,7 @@ public class EventController {
             this.participeRepository.findById(new ParticipesEntityId(connectedUserAccount.getId(), id))
                     .orElseThrow(()->new UnauthorizedException("you are not authorized to do this"));
 
-        EntriesEntity entity = modelMapper.map(entryDto, EntriesEntity.class);
+        final EntriesEntity entity = modelMapper.map(entryDto, EntriesEntity.class);
         entity.setEventId(id);
 
         this.entryRepository.save(entity);
@@ -139,9 +139,9 @@ public class EventController {
 
     @DeleteMapping("deleteEntry/{entryId}")
     public String deleteEntry(@PathVariable("id") final String id, @PathVariable("entryId") final String entryId, final Principal principal) {
-        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccount(principal);
+        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
 
-        EventsEntity event = this.eventRepository.findById(id).orElseThrow();
+        final EventsEntity event = this.eventRepository.findById(id).orElseThrow();
 
         if(!event.isPublicEntries())
             this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())

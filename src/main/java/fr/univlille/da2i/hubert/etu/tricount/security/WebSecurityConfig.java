@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -53,7 +52,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/index").permitAll()
                 .mvcMatchers("/register").permitAll()
                 .mvcMatchers("/login").permitAll()
-                .mvcMatchers("/h2-console").permitAll()
+                .mvcMatchers("/confirmation/**").permitAll()
+                .mvcMatchers("/password-reset/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/event/**").permitAll()
                 .mvcMatchers("/**").authenticated()
                 .and()

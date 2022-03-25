@@ -55,7 +55,7 @@ public class EventsController {
 
     @GetMapping("")
     public String createEventGet(final Model model, final Principal principal) {
-        final UserEntity user = this.userRetriever.getLoggedUserAccount(principal);
+        final UserEntity user = this.userRetriever.getLoggedUserAccountOrThrow(principal);
 
         model.addAttribute("userInfos", user);
         model.addAttribute("pageName", "Create event");
@@ -66,7 +66,7 @@ public class EventsController {
 
     @PostMapping("")
     public String createEventPost(@Valid final EventCreationDto eventCreationDto, final Principal principal, final ModelMapper modelMapper) {
-        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccount(principal);
+        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
 
         final EventsEntity event;
 

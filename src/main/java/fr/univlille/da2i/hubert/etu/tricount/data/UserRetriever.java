@@ -18,13 +18,17 @@ public class UserRetriever {
         this.accountRepository = accountRepository;
     }
 
-    public AccountEntity getLoggedUserAccount(final Principal principal) throws AuthenticationCredentialsNotFoundException {
+    public Optional<AccountEntity> getLoggedUserAccount(final Principal principal) throws AuthenticationCredentialsNotFoundException {
         Optional<AccountEntity> loggedUserAccount = Optional.empty();
         try {
             loggedUserAccount = this.accountRepository.findByUserEmail(principal.getName());
-        } catch (Exception e) {
+        } catch (final Exception e) {
         }
-        return loggedUserAccount.orElseThrow(() -> new UnauthorizedException("You need to be logged in to do this."));
+        return loggedUserAccount;
+    }
+
+    public AccountEntity getLoggedUserAccountOrThrow(final Principal principal) throws AuthenticationCredentialsNotFoundException {
+        return this.getLoggedUserAccount(principal).orElseThrow(() -> new UnauthorizedException("You need to be logged in to do this."));
     }
 
 }
