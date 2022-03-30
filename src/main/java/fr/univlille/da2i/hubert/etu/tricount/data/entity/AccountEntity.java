@@ -21,7 +21,7 @@ public class AccountEntity extends UserEntity {
 
     @Column(name = "enabled", nullable = false)
     @ColumnDefault("'false'")
-    private boolean enabled = false;
+    private boolean enabled;
 
     @Column(name = "confirmationcode")
     private String confirmationCode;

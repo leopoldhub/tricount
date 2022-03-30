@@ -29,7 +29,7 @@ public class EventsEntity {
     @ColumnDefault("'false'")
     private boolean publicEntries;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event", orphanRemoval = true)
     @JsonIgnore
     private List<ParticipesEntity> participes;
 

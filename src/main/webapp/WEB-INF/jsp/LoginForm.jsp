@@ -20,9 +20,24 @@
                   required
           />
         </div>
-        <button type="submit" class="btn btn-primary my-3">
-          Ask password reset
-        </button>
+        <div class="form-group my-3">
+          <label for="password">Password</label>
+          <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  placeholder="Password"
+                  name="password"
+                  required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary my-3">Login</button>
+        <div>
+          <a href="/password-reset" class="link"> I forgot my password </a>
+        </div>
+        <div>
+          <a href="/register" class="link"> I dont have an account! </a>
+        </div>
       </form>
     </div>
   </div>

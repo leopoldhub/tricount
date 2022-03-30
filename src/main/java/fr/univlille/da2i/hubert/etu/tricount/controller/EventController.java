@@ -7,6 +7,8 @@ import fr.univlille.da2i.hubert.etu.tricount.data.dto.ParticipeDto;
 import fr.univlille.da2i.hubert.etu.tricount.data.entity.*;
 import fr.univlille.da2i.hubert.etu.tricount.data.repository.*;
 import fr.univlille.da2i.hubert.etu.tricount.excpetion.UnauthorizedException;
+import fr.univlille.da2i.hubert.etu.tricount.logic.Debt;
+import fr.univlille.da2i.hubert.etu.tricount.logic.DebtResolver;
 import fr.univlille.da2i.hubert.etu.tricount.utils.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/event/{id}/")
@@ -37,12 +40,12 @@ public class EventController {
     private final EntryRepository entryRepository;
 
     public EventController(@Value("${appName}") final String appName,
-                            final EventRepository eventRepository,
-                            final ParticipeRepository participeRepository,
-                            final UserRetriever userRetriever,
-                            final AnonymousUserRepository anonymousUserRepository,
-                            final UserRepository userRepository,
-                            final EntryRepository entryRepository) {
+                           final EventRepository eventRepository,
+                           final ParticipeRepository participeRepository,
+                           final UserRetriever userRetriever,
+                           final AnonymousUserRepository anonymousUserRepository,
+                           final UserRepository userRepository,
+                           final EntryRepository entryRepository) {
         this.appName = appName;
         this.eventRepository = eventRepository;
         this.participeRepository = participeRepository;
@@ -52,12 +55,32 @@ public class EventController {
         this.entryRepository = entryRepository;
     }
 
-    @GetMapping("")//TODO: redirect /xxx => /xxx/
-    public String getEvent(@PathVariable("id") final String id, final Model model) {
+    @GetMapping("")
+    public String getEvent(@PathVariable("id") final String id, final Model model, final Principal principal) {
+
+        boolean isOwner = false;
+
+        try {
+            final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
+            isOwner = this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
+                    .get().isOwner();
+            model.addAttribute("userInfos", connectedUserAccount);
+        } catch (final Exception e) {
+        }
 
         final EventsEntity event = this.eventRepository.findById(id).orElseThrow(() -> new RuntimeException("Asked event not found"));
 
+        final DebtResolver debtResolver = new DebtResolver(event.getParticipes());
+
+        final List<Debt> debts = debtResolver.calculateDebts();
+
+        model.addAttribute("isPublicEntries", event.isPublicEntries());
+        model.addAttribute("isOwner", isOwner);
+        model.addAttribute("totalAmount", debtResolver.calculateTotalExpenses());
+        model.addAttribute("entries", debtResolver.obtainAllEntries());
+        model.addAttribute("participants", event.getParticipes());
         model.addAttribute("event", event);
+        model.addAttribute("debts", debts);
 
         return "Event";
     }
@@ -66,7 +89,7 @@ public class EventController {
     public String getEvent(@PathVariable("id") final String id, @RequestParam final boolean publicEntries, final Principal principal) {
         final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
         this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
-                .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
+                .orElseThrow(() -> new UnauthorizedException("you must be the owner of the event to do this"));
 
         final EventsEntity event = this.eventRepository.findById(id).orElseThrow();
 
@@ -77,24 +100,22 @@ public class EventController {
         return UrlUtils.buildRedirectUrl(String.format("/event/%s/", id));
     }
 
-    @DeleteMapping("")
+    @PostMapping("deleteEvent")
     public String deleteEvent(@PathVariable("id") final String id, final Principal principal) {
         final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
         this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
-                .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
+                .orElseThrow(() -> new UnauthorizedException("you must be the owner of the event to do this"));
 
-        if (this.participeRepository.existsById(new ParticipesEntityId()))
-            this.eventRepository.deleteById(id);
+        this.eventRepository.deleteById(id);
 
-        return UrlUtils.buildRedirectUrl(String.format("/event/%s/", id));
+        return UrlUtils.buildRedirectUrl(String.format("/account", id));
     }
 
     @PostMapping("addUser")
-    public String getEvent(@PathVariable("id") final String id, @Valid final ParticipantDto participantDto, final ModelMapper modelMapper, final Principal principal) {
-        //TODO: send mail...
+    public String addUser(@PathVariable("id") final String id, @Valid final ParticipantDto participantDto, final ModelMapper modelMapper, final Principal principal) {
         final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
         this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
-                .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
+                .orElseThrow(() -> new UnauthorizedException("you must be the owner of the event to do this"));
 
         final EventsEntity event = this.eventRepository.findById(id).orElseThrow();
 
@@ -116,18 +137,34 @@ public class EventController {
         return UrlUtils.buildRedirectUrl(String.format("/event/%s/", id));
     }
 
+    @PostMapping("deleteUser")
+    public String deleteUser(@PathVariable("id") final String id, @RequestParam final String userId, final Principal principal) {
+        final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
+        this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
+                .orElseThrow(() -> new UnauthorizedException("you must be the owner of the event to do this"));
+
+        final ParticipesEntity participesEntity = this.participeRepository.findByIdEventIdAndIdUserId(id, userId).orElseThrow();
+
+        if (participesEntity.isOwner())
+            throw new RuntimeException("impossible to delete owner!");
+
+        this.participeRepository.delete(participesEntity);
+
+        return UrlUtils.buildRedirectUrl(String.format("/event/%s/", id));
+    }
+
     @PostMapping("addEntry")
-    public String getEvent(@PathVariable("id") final String id, @Valid final EntryDto entryDto, final ModelMapper modelMapper, final Principal principal) {
+    public String addEntry(@PathVariable("id") final String id, @Valid final EntryDto entryDto, final ModelMapper modelMapper, final Principal principal) {
         final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
 
         final EventsEntity event = this.eventRepository.findById(id).orElseThrow();
 
-        if(!event.isPublicEntries())
+        if (!event.isPublicEntries())
             this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
-                    .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
+                    .orElseThrow(() -> new UnauthorizedException("you must be the owner of the event to do this"));
         else
             this.participeRepository.findById(new ParticipesEntityId(connectedUserAccount.getId(), id))
-                    .orElseThrow(()->new UnauthorizedException("you are not authorized to do this"));
+                    .orElseThrow(() -> new UnauthorizedException("you are not authorized to do this"));
 
         final EntriesEntity entity = modelMapper.map(entryDto, EntriesEntity.class);
         entity.setEventId(id);
@@ -137,18 +174,18 @@ public class EventController {
         return UrlUtils.buildRedirectUrl(String.format("/event/%s/", id));
     }
 
-    @DeleteMapping("deleteEntry/{entryId}")
-    public String deleteEntry(@PathVariable("id") final String id, @PathVariable("entryId") final String entryId, final Principal principal) {
+    @PostMapping("deleteEntry")
+    public String deleteEntry(@PathVariable("id") final String id, @RequestParam final String entryId, final Principal principal) {
         final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
 
         final EventsEntity event = this.eventRepository.findById(id).orElseThrow();
 
-        if(!event.isPublicEntries())
+        if (!event.isPublicEntries())
             this.participeRepository.findByIdEventIdAndIdUserIdAndOwnerTrue(id, connectedUserAccount.getId())
-                    .orElseThrow(()->new UnauthorizedException("you must be the owner of the event to do this"));
+                    .orElseThrow(() -> new UnauthorizedException("you must be the owner of the event to do this"));
         else
             this.participeRepository.findById(new ParticipesEntityId(connectedUserAccount.getId(), id))
-                    .orElseThrow(()->new UnauthorizedException("you are not authorized to do this"));
+                    .orElseThrow(() -> new UnauthorizedException("you are not authorized to do this"));
 
         this.entryRepository.deleteById(entryId);
 

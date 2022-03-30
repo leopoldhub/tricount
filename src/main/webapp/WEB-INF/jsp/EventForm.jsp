@@ -2,40 +2,54 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset='utf-8'>
-  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-  <title>${pageName}</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <jsp:include page="Bootstrap.jsp" />
-  <link href="./css/Form.css" rel="stylesheet">
-</head>
+<jsp:include page="Head.jsp" />
 <body>
-  <div class="container">
-    <jsp:include page="Header.jsp" />
+<jsp:include page="Header.jsp" />
+<div class="container mt-5 p-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-3 col-md-8 col-sm-12">
+      <h3>Create event</h3>
+      <form method="post">
+        <div class="form-group my-3">
+          <label for="title">Title</label>
+          <input
+                  type="text"
+                  class="form-control"
+                  id="title"
+                  placeholder="Title"
+                  name="title"
+                  required
+          />
+        </div>
+        <div class="form-group my-3">
+          <label for="description">Description</label>
+          <input
+                  type="text"
+                  class="form-control"
+                  id="description"
+                  placeholder="Description"
+                  name="description"
+                  required
+          />
+        </div>
+        <div class="form-group my-3">
+          <label for="username">Username</label>
+          <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  placeholder="Username"
+                  name="username"
+                  required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary my-3">
+          Create event
+        </button>
+      </form>
+    </div>
   </div>
-  <main class="form-signin">
-    <form method="post">
-      <h1 class="h3 mb-3 fw-normal">${pageName}</h1>
-      <c:if test="${param.error != null}">
-        <div class="alert alert-danger" role="alert">${param.error.isEmpty()?"Error in form.":param.error}</div>
-      </c:if>
-      <c:if test="${param.info != null}">
-        <div class="alert alert-primary" role="alert">${param.info}</div>
-      </c:if>
-      <div class="form-floating">
-        <input type="text" class="form-control" id="title" name="title1" placeholder="Title" minlength="5" maxlength="64">
-        <label for="title">Title</label>
-      </div>
-      <div class="form-floating">
-        <input type="text" class="form-control" id="description" name="description" placeholder="Description" minlength="6" maxlength="64">
-        <label for="description">Description</label>
-      </div>
-      <div class="form-floating">
-        <input type="text" class="form-control" id="username" name="username" placeholder="Username" minlength="6" maxlength="16">
-        <label for="username">Username</label>
-      </div>
-      <button class="w-100 btn btn-lg btn-primary" type="submit">Create event</button>
-    </form>
-  </main>
+</div>
+<jsp:include page="Toaster.jsp" />
+</body>
 </html>

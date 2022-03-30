@@ -1,21 +1,46 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-  <header>
-    <div class="d-flex flex-column flex-md-row align-items-center pb-1 my-3 border-bottom">
-      <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-        <h1>${appName}</h1>
-      </a>
-
-      <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
-        <a class="mx-2 py-2 text-dark text-decoration-none" href="/">Accueil</a>
-        <c:if test="${userInfos == null}">
-          <a class="mx-2 py-2 text-dark text-decoration-none" href="/login">Login</a>
-          <a class="mx-2 py-2 text-dark text-decoration-none" href="/register">Register</a>
-        </c:if>
-        <c:if test="${userInfos != null}">
-          <a class="mx-2 py-2 text-dark text-decoration-none" href="/account">Account</a>
-          <a class="mx-2 py-2 text-dark text-decoration-none" href="/logout">Logout</a>
-        </c:if>
-      </nav>
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
+    <div class="container-fluid">
+      <img src="https://identite.univ-lille.fr/fileadmin/user_upload/identite/Images/Logo.sans.baseline-Horizontal-RVB-Noir.svg" style="height: 50px" />
+      <a class="navbar-brand" href="/"><c:out value="${appName}"/></a>
+      <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarCollapse"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/event">Create event</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav mb-2 mb-md-0">
+          <c:if test="${userInfos == null}">
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+          </c:if>
+          <c:if test="${userInfos != null}">
+            <li class="nav-item">
+              <a class="nav-link" href="/account">Account</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          </c:if>
+        </ul>
+      </div>
     </div>
-  </header>
+  </nav>
+</header>

@@ -8,9 +8,9 @@ import javax.mail.internet.MimeMessage;
 
 public class MailUtils {
 
-    public static void sendMail(JavaMailSender sender, String from, String to, String subject, String content) throws MessagingException {
-        MimeMessage message = sender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
+    public static void sendMail(final JavaMailSender sender, final String from, final String to, final String subject, final String content) throws MessagingException {
+        final MimeMessage message = sender.createMimeMessage();
+        final MimeMessageHelper helper = new MimeMessageHelper(message);
         helper.setFrom(from);
         helper.setTo(to);
         helper.setSubject(subject);

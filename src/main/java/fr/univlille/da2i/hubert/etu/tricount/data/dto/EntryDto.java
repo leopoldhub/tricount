@@ -12,6 +12,8 @@ public class EntryDto {
     @NotEmpty
     private String userId;
 
+    private String description;
+
     @NotNull
     @Min(0)
     private Double amount;

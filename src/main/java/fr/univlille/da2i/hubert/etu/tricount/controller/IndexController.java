@@ -26,7 +26,7 @@ public class IndexController {
 
     @RequestMapping({"/", "/index"})
     public String index(final Model model, final Principal principal) {
-        AccountEntity user = this.userRetriever.getLoggedUserAccount(principal).orElse(null);
+        final AccountEntity user = this.userRetriever.getLoggedUserAccount(principal).orElse(null);
 
         model.addAttribute("userInfos", user);
         model.addAttribute("pageName", "Index");

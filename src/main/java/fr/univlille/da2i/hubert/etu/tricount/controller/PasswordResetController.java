@@ -18,15 +18,15 @@ import java.util.UUID;
 @RequestMapping("/password-reset")
 public class PasswordResetController {
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public PasswordResetController(AccountRepository accountRepository,
-                                   JavaMailSender javaMailSender,
-                                   PasswordEncoder passwordEncoder) {
+    public PasswordResetController(final AccountRepository accountRepository,
+                                   final JavaMailSender javaMailSender,
+                                   final PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
         this.javaMailSender = javaMailSender;
         this.passwordEncoder = passwordEncoder;
@@ -38,7 +38,7 @@ public class PasswordResetController {
     }
 
     @PostMapping("")
-    public String sendPasswordReset(@RequestParam("email") String email) throws MessagingException {
+    public String sendPasswordReset(@RequestParam("email") final String email) throws MessagingException {
         AccountEntity accountEntity = this.accountRepository.findByUserEmail(email).orElseThrow(() -> new InvalidParameterException("invalid email"));
         accountEntity.setConfirmationCode(UUID.randomUUID().toString());
         accountEntity = this.accountRepository.save(accountEntity);
@@ -49,8 +49,8 @@ public class PasswordResetController {
     }
 
     @GetMapping("{email}/{confirmation-id}")
-    public String resetPasword(@PathVariable("email") String email, @PathVariable("confirmation-id") String confirmationId) {
-        AccountEntity accountEntity = this.accountRepository.findByUserEmail(email).orElseThrow(() -> new InvalidParameterException("invalid email"));
+    public String resetPasword(@PathVariable("email") final String email, @PathVariable("confirmation-id") final String confirmationId) {
+        final AccountEntity accountEntity = this.accountRepository.findByUserEmail(email).orElseThrow(() -> new InvalidParameterException("invalid email"));
 
         if (accountEntity.getConfirmationCode().equals(confirmationId)) {
             return "ResetPassword";
@@ -59,11 +59,11 @@ public class PasswordResetController {
     }
 
     @PostMapping("{email}/{confirmation-id}")
-    public String resetPasword(@PathVariable("email") String email, @PathVariable("confirmation-id") String confirmationId, ResetPasswordDto resetPasswordDto) {
-        AccountEntity accountEntity = this.accountRepository.findByUserEmail(email).orElseThrow(() -> new InvalidParameterException("invalid email"));
+    public String resetPasword(@PathVariable("email") final String email, @PathVariable("confirmation-id") final String confirmationId, final ResetPasswordDto resetPasswordDto) {
+        final AccountEntity accountEntity = this.accountRepository.findByUserEmail(email).orElseThrow(() -> new InvalidParameterException("invalid email"));
 
         if (!resetPasswordDto.getPassword().equals(resetPasswordDto.getConfirmpassword()))
-            return "redirect:?error=Passwords does not match.";
+            return UrlUtils.buildRedirectUrlWithError("./"+confirmationId, "Passwords does not match.");
 
         if (accountEntity.getConfirmationCode().equals(confirmationId)) {
             accountEntity.setPassword(this.passwordEncoder.encode(resetPasswordDto.getPassword()));

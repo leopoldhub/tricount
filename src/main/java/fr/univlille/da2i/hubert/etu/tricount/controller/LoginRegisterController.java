@@ -1,10 +1,12 @@
 package fr.univlille.da2i.hubert.etu.tricount.controller;
 
+import fr.univlille.da2i.hubert.etu.tricount.data.UserRetriever;
 import fr.univlille.da2i.hubert.etu.tricount.data.entity.AccountEntity;
 import fr.univlille.da2i.hubert.etu.tricount.data.dto.RegisterAccountDto;
 import fr.univlille.da2i.hubert.etu.tricount.data.repository.AccountRepository;
 import fr.univlille.da2i.hubert.etu.tricount.data.repository.UserRepository;
 import fr.univlille.da2i.hubert.etu.tricount.utils.MailUtils;
+import fr.univlille.da2i.hubert.etu.tricount.utils.UrlUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.UUID;
 
 @Controller
@@ -30,42 +33,56 @@ public class LoginRegisterController {
 
     private final AccountRepository accountRepository;
 
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+
+    private final UserRetriever userRetriever;
 
     public LoginRegisterController(@Value("${appName}") final String appName,
                                    final BCryptPasswordEncoder passwordEncoder,
                                    final UserRepository userRepository,
                                    final AccountRepository accountRepository,
-                                   JavaMailSender javaMailSender) {
+                                   final JavaMailSender javaMailSender,
+                                   final UserRetriever userRetriever) {
         this.appName = appName;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.javaMailSender = javaMailSender;
+        this.userRetriever = userRetriever;
     }
 
     @GetMapping("/login")
-    public String login(final Model model, @RequestParam(value = "error", required = false) final String error) {
+    public String login(final Model model, @RequestParam(value = "error", required = false) final String error, final Principal principal) {
+        try {
+            final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
+            model.addAttribute("userInfos", connectedUserAccount);
+        }catch (final Exception e){}
+
         model.addAttribute("appName", this.appName);
         model.addAttribute("pageName", "login");
         model.addAttribute("errorMessage", error);
-        return "LoginRegisterForm";
+        return "LoginForm";
     }
 
     @GetMapping("/register")
-    public String registerGet(final Model model, @RequestParam(value = "error", required = false) final String error) {
+    public String registerGet(final Model model, @RequestParam(value = "error", required = false) final String error, final Principal principal) {
+        try {
+            final AccountEntity connectedUserAccount = this.userRetriever.getLoggedUserAccountOrThrow(principal);
+            model.addAttribute("userInfos", connectedUserAccount);
+        }catch (final Exception e){}
+
         model.addAttribute("appName", this.appName);
         model.addAttribute("pageName", "register");
         model.addAttribute("error", error);
-        return "LoginRegisterForm";
+        return "RegisterForm";
     }
 
     @PostMapping("/register")
-    public String registerPost(@Valid final RegisterAccountDto accountDto, ModelMapper modelMapper) throws MessagingException {
+    public String registerPost(@Valid final RegisterAccountDto accountDto, final ModelMapper modelMapper) throws MessagingException {
         if (!accountDto.getPassword().equals(accountDto.getConfirmpassword()))
-            return "redirect:/register?error=Passwords does not match.";
+            return UrlUtils.buildRedirectUrlWithError("/register", "Passwords does not match.");
         if (!this.accountRepository.findByUserEmail(accountDto.getEmail()).isEmpty())
-            return "redirect:/register?error=Email already taken.";
+            return UrlUtils.buildRedirectUrlWithError("/register", "Email already taken.");
 
         accountDto.setPassword(this.passwordEncoder.encode(accountDto.getPassword()));
 
@@ -76,7 +93,7 @@ public class LoginRegisterController {
 
         MailUtils.sendMail(this.javaMailSender, "leopold.hubert.etu@univ-lille.fr", account.getEmail(), "Please confirm your account creation", "confirm your account by clicking here: http://localhost:8080/confirmation/" + account.getEmail() + "/" + account.getConfirmationCode());
 
-        return "redirect:/login?info=Please validate your email to end the registration!";
+        return UrlUtils.buildRedirectUrlWithInfo("/login", "Please validate your email to end the registration!");
     }
 
 }

@@ -14,15 +14,15 @@ import java.security.InvalidParameterException;
 @RequestMapping("/confirmation")
 public class ConfirmationController {
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    public ConfirmationController(AccountRepository accountRepository) {
+    public ConfirmationController(final AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
     @RequestMapping("{email}/{confirmation-id}")
-    public String confirmAccount(@PathVariable("email") String email, @PathVariable("confirmation-id") String confirmationId) {
-        AccountEntity accountEntity = this.accountRepository.findByUserEmail(email).orElseThrow(() -> new InvalidParameterException("invalid email"));
+    public String confirmAccount(@PathVariable("email") final String email, @PathVariable("confirmation-id") final String confirmationId) {
+        final AccountEntity accountEntity = this.accountRepository.findByUserEmail(email).orElseThrow(() -> new InvalidParameterException("invalid email"));
 
         if (accountEntity.getConfirmationCode().equals(confirmationId)) {
             accountEntity.setEnabled(true);

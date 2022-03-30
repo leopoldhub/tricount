@@ -19,9 +19,18 @@ spring:
     host: "smtp.univ-lille.fr"
     port: 587
     username: "leopold.hubert.etu@univ-lille.fr"
+    password: "**********"
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+server:
+  ssl:
+    key-store-type: PKCS12
+    key-store: tricount.p12
+    key-store-password: password
+    key-alias: tricount
+    enabled: true
+  port: 8443

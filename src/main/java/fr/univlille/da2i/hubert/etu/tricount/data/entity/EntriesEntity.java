@@ -6,6 +6,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "entries")
@@ -26,6 +27,12 @@ public class EntriesEntity {
 
     @Column(name = "amount", nullable = false)
     private Double amount;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "datetime")
+    private LocalDateTime localDateTime = LocalDateTime.now();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)

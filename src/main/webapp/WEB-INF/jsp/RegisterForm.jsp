@@ -10,7 +10,18 @@
     <div class="col-lg-3 col-md-8 col-sm-12">
       <form method="post">
         <div class="form-group my-3">
-          <label for="password">New password</label>
+          <label for="email">Email address</label>
+          <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Email"
+                  name="email"
+                  required
+          />
+        </div>
+        <div class="form-group my-3">
+          <label for="password">Password</label>
           <input
                   type="password"
                   class="form-control"
@@ -31,9 +42,13 @@
                   required
           />
         </div>
-        <button type="submit" class="btn btn-primary my-3">
-          Save password
-        </button>
+        <button type="submit" class="btn btn-primary my-3">Register</button>
+        <div>
+          <a href="/password-reset" class="link"> I forgot my password </a>
+        </div>
+        <div>
+          <a href="/login" class="link"> Already have an account? </a>
+        </div>
       </form>
     </div>
   </div>
