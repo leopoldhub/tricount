@@ -37,13 +37,17 @@ public class LoginRegisterController {
 
     private final UserRetriever userRetriever;
 
+    private final String contextPath;
+
     public LoginRegisterController(@Value("${appName}") final String appName,
+                                   @Value("${server.servlet.context-path}") final String contextPath,
                                    final BCryptPasswordEncoder passwordEncoder,
                                    final UserRepository userRepository,
                                    final AccountRepository accountRepository,
                                    final JavaMailSender javaMailSender,
                                    final UserRetriever userRetriever) {
         this.appName = appName;
+        this.contextPath = contextPath;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
@@ -91,7 +95,7 @@ public class LoginRegisterController {
 
         account = this.accountRepository.save(account);
 
-        MailUtils.sendMail(this.javaMailSender, "leopold.hubert.etu@univ-lille.fr", account.getEmail(), "Please confirm your account creation", "confirm your account by clicking here: http://localhost:8080/confirmation/" + account.getEmail() + "/" + account.getConfirmationCode());
+        MailUtils.sendMail(this.javaMailSender, "leopold.hubert.etu@univ-lille.fr", account.getEmail(), "Please confirm your account creation", "confirm your account by clicking here: http://localhost:8443"+contextPath+"/confirmation/" + account.getEmail() + "/" + account.getConfirmationCode());
 
         return UrlUtils.buildRedirectUrlWithInfo("/login", "Please validate your email to end the registration!");
     }

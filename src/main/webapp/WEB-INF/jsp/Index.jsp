@@ -10,7 +10,7 @@
     <h1><c:out value="${appName}"/></h1>
     <p class="lead my-3"><c:out value="${appDescription}"/></p>
     <p class="lead mb-0">
-      <a href="/event" class="btn btn-light">Create an event</a>
+      <a href="${pageContext.request.contextPath}/event" class="btn btn-light">Create an event</a>
     </p>
   </div>
 </div>

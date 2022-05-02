@@ -37,6 +37,7 @@ public class EventsController {
 
     private final EntryRepository entryRepository;
 
+
     public EventsController(@Value("${appName}") final String appName,
                             final EventRepository eventRepository,
                             final ParticipeRepository participeRepository,

@@ -5,6 +5,7 @@ import fr.univlille.da2i.hubert.etu.tricount.data.entity.AccountEntity;
 import fr.univlille.da2i.hubert.etu.tricount.data.repository.AccountRepository;
 import fr.univlille.da2i.hubert.etu.tricount.utils.MailUtils;
 import fr.univlille.da2i.hubert.etu.tricount.utils.UrlUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -24,9 +25,13 @@ public class PasswordResetController {
 
     private final PasswordEncoder passwordEncoder;
 
-    public PasswordResetController(final AccountRepository accountRepository,
+    private final String contextPath;
+
+    public PasswordResetController(@Value("${server.servlet.context-path}") final String contextPath,
+                                   final AccountRepository accountRepository,
                                    final JavaMailSender javaMailSender,
                                    final PasswordEncoder passwordEncoder) {
+        this.contextPath = contextPath;
         this.accountRepository = accountRepository;
         this.javaMailSender = javaMailSender;
         this.passwordEncoder = passwordEncoder;
@@ -43,7 +48,7 @@ public class PasswordResetController {
         accountEntity.setConfirmationCode(UUID.randomUUID().toString());
         accountEntity = this.accountRepository.save(accountEntity);
 
-        MailUtils.sendMail(this.javaMailSender, "leopold.hubert.etu@univ-lille.fr", email, "Reset your password", "reset your password by clicking here: http://localhost:8080/password-reset/" + email + "/" + accountEntity.getConfirmationCode());
+        MailUtils.sendMail(this.javaMailSender, "leopold.hubert.etu@univ-lille.fr", email, "Reset your password", "reset your password by clicking here: http://localhost:8443"+contextPath+"/password-reset/" + email + "/" + accountEntity.getConfirmationCode());
 
         return UrlUtils.buildRedirectUrlWithInfo("/login", "reset link sent by mail");
     }

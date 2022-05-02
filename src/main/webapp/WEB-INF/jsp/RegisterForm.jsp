@@ -44,10 +44,10 @@
         </div>
         <button type="submit" class="btn btn-primary my-3">Register</button>
         <div>
-          <a href="/password-reset" class="link"> I forgot my password </a>
+          <a href="${pageContext.request.contextPath}/password-reset" class="link"> I forgot my password </a>
         </div>
         <div>
-          <a href="/login" class="link"> Already have an account? </a>
+          <a href="${pageContext.request.contextPath}/login" class="link"> Already have an account? </a>
         </div>
       </form>
     </div>

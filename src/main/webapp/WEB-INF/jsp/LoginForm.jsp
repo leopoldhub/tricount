@@ -33,10 +33,10 @@
         </div>
         <button type="submit" class="btn btn-primary my-3">Login</button>
         <div>
-          <a href="/password-reset" class="link"> I forgot my password </a>
+          <a href="${pageContext.request.contextPath}/password-reset" class="link"> I forgot my password </a>
         </div>
         <div>
-          <a href="/register" class="link"> I dont have an account! </a>
+          <a href="${pageContext.request.contextPath}/register" class="link"> I dont have an account! </a>
         </div>
       </form>
     </div>

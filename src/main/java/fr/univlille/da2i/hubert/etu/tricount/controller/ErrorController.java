@@ -5,7 +5,6 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.StringJoiner;
@@ -21,7 +20,7 @@ public class ErrorController {
 
             if (exception instanceof BindException) {
                 final BindException bindException = (BindException) exception;
-                message = ErrorController.bindExceptionToString(bindException);
+                message = bindExceptionToString(bindException);
             } else {
                 message = exception.getMessage();
             }

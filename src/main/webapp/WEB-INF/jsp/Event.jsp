@@ -161,7 +161,7 @@
                     <c:forEach items="${participants}" var="participe">
                         <div class="list-group-item d-flex gap-3 py-3">
                             <img
-                                    src="https://yt3.ggpht.com/SY5Z1yXLHTqRQUZRk3EGsjBtYuwDD4DKYfEtU5pkTnwlzZLkBuDU0DWO9BNMnNuFjodHfVg_YQw=s900-c-k-c0x00ffffff-no-rj"
+                                    src="https://www.clubster-nsl.com/wp-content/uploads/sites/2/2020/10/Logo-Universite-de-Lille.png"
                                     alt="twbs"
                                     class="rounded-circle flex-shrink-0"
                                     width="32"

@@ -9,7 +9,7 @@
     <div class="list-group">
         <c:forEach items="${eventDifferences}" var="entry">
             <a
-                    href="/event/${entry.getKey().getId()}/"
+                    href="${pageContext.request.contextPath}/event/${entry.getKey().getId()}/"
                     class="list-group-item list-group-item-action d-flex gap-3 py-3 align-items-start"
             >
                 <div class="d-flex gap-2 w-100 justify-content-between">

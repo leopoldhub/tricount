@@ -19,7 +19,7 @@ spring:
     host: "smtp.univ-lille.fr"
     port: 587
     username: "leopold.hubert.etu@univ-lille.fr"
-    password: "**********"
+    password: "BG3643BATTLES_"
     properties:
       mail:
         smtp:
@@ -29,8 +29,10 @@ spring:
 server:
   ssl:
     key-store-type: PKCS12
-    key-store: tricount.p12
+    key-store: classpath:tricount.p12
     key-store-password: password
     key-alias: tricount
     enabled: true
   port: 8443
+  servlet:
+    context-path: "/tricount"

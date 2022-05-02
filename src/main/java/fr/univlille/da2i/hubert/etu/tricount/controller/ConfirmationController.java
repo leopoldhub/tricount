@@ -3,6 +3,7 @@ package fr.univlille.da2i.hubert.etu.tricount.controller;
 import fr.univlille.da2i.hubert.etu.tricount.data.entity.AccountEntity;
 import fr.univlille.da2i.hubert.etu.tricount.data.repository.AccountRepository;
 import fr.univlille.da2i.hubert.etu.tricount.utils.UrlUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import java.security.InvalidParameterException;
 public class ConfirmationController {
 
     private final AccountRepository accountRepository;
+
 
     public ConfirmationController(final AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
